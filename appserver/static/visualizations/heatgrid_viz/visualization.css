@@ -1,0 +1,32 @@
+.heatgrid_viz-container {
+    position:relative;
+    /*display: flex;
+    justify-content: center;*/
+}
+.heatgrid_viz-container svg {
+    margin: 10px auto;
+    display: block;
+}
+.heatgrid_viz-tooltip {
+    position: absolute;
+    z-index: 10;
+    visibility: hidden;
+    /* background-color: #F2F4F5;
+    border: 1px solid #C6C6C6; */
+    background-color: white;
+    text-align: center;
+    padding: 6px 10px;
+    border-radius: 4px;
+    color: #5E5E5E;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+}
+heatgrid_viz-theme-dark .heatgrid_viz-tooltip {
+    color: #c6c6c6;
+    background-color: black;
+}
+.heatgrid_viz-bad_data {
+    text-align: center;
+    color: #818d99;
+    font-size: 15px;
+    line-height: 2;
+}

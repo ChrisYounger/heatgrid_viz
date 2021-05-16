@@ -1,0 +1,285 @@
+<dashboard theme="light" hideAppBar="true">
+  <label>Heatgrid Viz - Documentation</label>
+  <row>
+    <panel>
+      <html>
+<style>
+.table td, .table th {
+  vertical-align: middle;
+}
+</style>
+<div style="max-width: 1200px; margin: 0 auto;">
+<p>Configurable Heat Grid / Heatmap visualization that can be used to show the quick status or health of many items at once. Support for grouping, and can display as hexagons, squares, diamonds or circles. Fully customisable tooltips, drilldown support, and numerous color schemes. Works in dark-mode.</p>
+<br/>
+<p>Copyright (C) 2020 Chris Younger | <a href="https://github.com/ChrisYounger/heatgrid_viz">Source code</a> | <a href="https://splunkbase.splunk.com/app/TODO/">Splunkbase</a> | <a href="https://answers.splunk.com/app/questions/TODO.html">Questions, Bugs or Suggestions</a> | <a href="https://splunkbase.splunk.com/apps/#/author/chrisyoungerjds">My Splunk apps</a></p>
+
+<br/>
+<br/>
+
+<h2>Usage</h2>
+<p>This visualisation expects data with specific field names. </p>
+<pre class="highlight">
+<code>some search... | table value tooltip group</code></pre>
+<br/>
+<br/>
+<p>These are the fields that can be provided in data:</p>
+<table class="table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+                  <code>value</code>
+                </td>
+<td>Numeric</td>
+<td>This is the value that is used to determine the color of this cell. By default expected range is between 0 and 100. If the range of your data is different, then change the 'data range' option in the 'format' menu. Either this or the 'color' field below is mandatory.</td>
+</tr>
+<tr>
+<td>
+                  <code>color</code>
+                </td>
+<td>String</td>
+<td>The color of the cell can be explicity set by passing in a valid html color code (E.g. "#FFFFFF", "red", or "rga(0,255,0)"). Either this or 'value' field above must be supplied.</td>
+</tr>
+<tr>
+<td>
+                  <code>tooltip</code>
+                </td>
+<td>String</td>
+<td>The contents to show on the tooltip when this cell is hovered.</td>
+</tr>
+<tr>
+<td>
+                  <code>tooltip_value</code>
+                </td>
+<td>String</td>
+<td>Specify what value should be shown on the tooltip when hovering this cell. For example, to set a % sign: <code>| eval tooltip_value = value + " %"</code></td>
+</tr>
+<tr>
+<td>
+                  <code>tooltip_html</code>
+                </td>
+<td>String</td>
+<td>Providing this field will override the other tooltip fields and will allow fully custom HTML content. For example: <code>| eval tooltip_html = "Location: Sydney&lt;/br&gt;Owner: Operations&lt;/br&gt;Value: &lt;strong&gt;" + value + " %&lt;strong&gt;"</code></td>
+</tr>
+<tr>
+<td>
+                  <code>group</code>
+                </td>
+<td>String</td>
+<td>If the group field is provided then cells with the same value will be grouped together with a label. Note that groups with only a few items in them may not layout very well. Squares and hexagons shapes allow for the most efficient use of space.</td>
+</tr>
+<tr>
+<td>
+                  <code>drilldown</code>
+                </td>
+<td>String</td>
+<td>If supplied, clicking the cell will cause a token to be set with this value. The default token is <code>heatgrid_viz_drilldown</code> but it can be changed in the 'Format' menu.</td>
+</tr>
+<tr>
+<td>
+                  <code>drilldown_url</code>
+                </td>
+<td>String</td>
+<td>If supplied, will cause this URL to be opened in a new tab/window when the cell is clicked.</td>
+</tr>
+
+</tbody>
+</table>
+<br/>
+<br/>
+
+<h2>Formatting options</h2>
+
+<img src="/static/app/heatgrid_viz/formatting.png"/>
+<br/>
+<br/>
+<br/>
+
+<h2>Third party software</h2>
+<p>The following third-party libraries are used by this app. Thank you!</p>
+<ul>
+<li>Font Awesome - Creative Commons Attribution-ShareAlike 4.0 License - <a href="https://fontawesome.com/">https://fontawesome.com/</a></li>
+<li>jQuery - MIT - <a href="https://jquery.com/">https://jquery.com/</a></li>
+<li>D3 - BSD 3-Clause - <a href="https://d3js.org/">https://d3js.org/</a></li>
+</ul>
+
+</div>
+</html>
+    </panel>
+    <panel>
+      <viz type="sunburst_viz.sunburst_viz">
+        <title>Example 1</title>
+        <search>
+          <query>| makeresults   
+| eval raw = "
+index=checkpoint sourcetype=opsec source=1.2.3.4 count=936498 ### 
+index=checkpoint sourcetype=opsec source=1.2.5.6 count=856998 ### 
+index=gateways sourcetype=pan_traffic source=/rsyslog/1.2.3.4/XX.log count=1200098 ### 
+index=gateways sourcetype=f5 source=/rsyslog/1.2.3.6/XX.log count=200098 ### 
+index=sysmon sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational	source=WinEventLog:ForwardedEvents	 count=356998 ### 
+index=stream sourcetype=stream:ip	source=stream:Splunk_IP count=256998 ### 
+index=gateway sourcetype=iis	source=C:\inetpub\logs\LogFiles\W#SVC#\u_ex#.log count=156998 ### 
+index=summary sourcetype=stash	source=Datamodel Status Trend count=56998 ### 
+index=stream sourcetype=stream:udp	source=stream:Splunk_Udp count=56998
+"
+| makemv delim="###" raw
+| mvexpand raw 
+| rename raw  as  _raw 
+| extract
+|  table index sourcetype source count</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="height">450</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="sunburst_viz.sunburst_viz.breadcrumbs">show</option>
+        <option name="sunburst_viz.sunburst_viz.color">schemeCategory10</option>
+        <option name="sunburst_viz.sunburst_viz.colormode">root</option>
+        <option name="sunburst_viz.sunburst_viz.labelcolor">#000000</option>
+        <option name="sunburst_viz.sunburst_viz.labels">show</option>
+        <option name="sunburst_viz.sunburst_viz.labelsize">120</option>
+        <option name="sunburst_viz.sunburst_viz.labelwidth">120</option>
+        <option name="sunburst_viz.sunburst_viz.mode">static</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+      </viz>
+      <viz type="sunburst_viz.sunburst_viz">
+        <title>Example 2</title>
+        <search>
+          <query>| makeresults   
+| eval raw = "
+sourcetype=config_explorer component= log_level= count=627 ###
+sourcetype=ex23sample_controller-2 component= log_level= count=5 ###
+sourcetype=example_code-2 component= log_level= count=5 ###
+sourcetype=metric_collector-2 component= log_level= count=140 ###
+sourcetype=mongod component=system log_level= count=521 ###
+sourcetype=scheduler component=SavedSearchHistory log_level=INFO count=20 ###
+sourcetype=scheduler component=SavedSplunker log_level=INFO count=34 ###
+sourcetype=splunk:tabuilder:log component= log_level= count=210 ###
+sourcetype=splunk_archiver-2 component= log_level= count=24 ###
+sourcetype=splunk_instrumentation-3 component= log_level= count=307 ###
+sourcetype=splunk_web_access component= log_level= count=3839 ###
+sourcetype=splunk_web_service component=__init__ log_level=INFO count=40 ###
+sourcetype=splunk_web_service component=admin log_level=INFO count=1 ###
+sourcetype=splunk_web_service component=appnav log_level=WARNING count=172 ###
+sourcetype=splunk_web_service component=config log_level=ERROR count=5 ###
+sourcetype=splunk_web_service component=custom log_level=INFO count=70 ###
+sourcetype=splunk_web_service component=error log_level=INFO count=5 ###
+sourcetype=splunk_web_service component=i18n_catalog log_level=INFO count=200 ###
+sourcetype=splunk_web_service component=lists log_level=INFO count=20 ###
+sourcetype=splunk_web_service component=root log_level=INFO count=942 ###
+sourcetype=splunk_web_service component=view log_level=INFO count=346 ###
+sourcetype=splunkd component=ApplicationLicense log_level=INFO count=5 ###
+sourcetype=splunkd component=AuthenticationManagerSplunk log_level=WARN count=1 ###
+sourcetype=splunkd component=BucketMover log_level=INFO count=24 ###
+sourcetype=splunkd component=BundlesSetup log_level=INFO count=5 ###
+sourcetype=splunkd component=CMBucketId log_level=INFO count=20 ###
+sourcetype=splunkd component=CertStorageProvider log_level=INFO count=20 ###
+sourcetype=splunkd component=ClientSessionsManager log_level=INFO count=5 ###
+sourcetype=splunkd component=ClusteringMgr log_level=INFO count=10 ###
+sourcetype=splunkd component=DC:DeploymentClient log_level=INFO count=5 ###
+sourcetype=splunkd component=DC:DeploymentClient log_level=WARN count=5 ###
+sourcetype=splunkd component=DSManager log_level=INFO count=10 ###
+sourcetype=splunkd component=DS_DC_Common log_level=INFO count=30 ###
+sourcetype=splunkd component=DatabaseDirectoryManager log_level=INFO count=325 ###
+sourcetype=splunkd component=DeploymentServer log_level=INFO count=10 ###
+sourcetype=splunkd component=ExecProcessor log_level=INFO count=107 ###
+sourcetype=splunkd component=HotBucketRoller log_level=INFO count=68 ###
+sourcetype=splunkd component=HotDBManager log_level=INFO count=332 ###
+sourcetype=splunkd component=HttpListener log_level=ERROR count=4 ###
+sourcetype=splunkd component=HttpListener log_level=WARN count=1 ###
+sourcetype=splunkd component=IndexConfig log_level=WARN count=40 ###
+sourcetype=splunkd component=IndexProcessor log_level=INFO count=45 ###
+sourcetype=splunkd component=IndexWriter log_level=INFO count=196 ###
+sourcetype=splunkd component=IndexerIf log_level=INFO count=27 ###
+sourcetype=splunkd component=IndexerInit log_level=INFO count=5 ###
+sourcetype=splunkd component=IndexerService log_level=INFO count=55 ###
+sourcetype=splunkd component=IntrospectionGenerator:disk_objects log_level=INFO count=15 ###
+sourcetype=splunkd component=IntrospectionGenerator:resource_usage log_level=ERROR count=5 ###
+sourcetype=splunkd component=IntrospectionGenerator:resource_usage log_level=INFO count=10 ###
+sourcetype=splunkd component=IntrospectionGenerator:resource_usage log_level=WARN count=5 ###
+sourcetype=splunkd component=KeyManagerLocalhost log_level=INFO count=30 ###
+sourcetype=splunkd component=LMConfig log_level=INFO count=45 ###
+sourcetype=splunkd component=LMSlaveInfo log_level=INFO count=11 ###
+sourcetype=splunkd component=LMStack log_level=INFO count=5 ###
+sourcetype=splunkd component=LMStackMgr log_level=INFO count=47 ###
+sourcetype=splunkd component=LMTracker log_level=INFO count=230 ###
+sourcetype=splunkd component=LicenseMgr log_level=INFO count=20 ###
+sourcetype=splunkd component=LicenseUsage log_level=INFO count=2 ###
+sourcetype=splunkd component=MPool log_level=INFO count=5 ###
+sourcetype=splunkd component=ModularInputs log_level=INFO count=75 ###
+sourcetype=splunkd component=OnlineFsck log_level=INFO count=17 ###
+sourcetype=splunkd component=PipeFlusher log_level=INFO count=10 ###
+sourcetype=splunkd component=PipelineComponent log_level=INFO count=20 ###
+sourcetype=splunkd component=ProcessTracker log_level=INFO count=16 ###
+sourcetype=splunkd component=ProcessTracker log_level=WARN count=80 ###
+sourcetype=splunkd component=ProxyConfig log_level=INFO count=15 ###
+sourcetype=splunkd component=PubSubSvr log_level=INFO count=20 ###
+sourcetype=splunkd component=Rsa2FA log_level=INFO count=10 ###
+sourcetype=splunkd component=SHCConfig log_level=WARN count=5 ###
+sourcetype=splunkd component=SHClusterMgr log_level=INFO count=10 ###
+sourcetype=splunkd component=ScheduledViewsReaper log_level=INFO count=5 ###
+sourcetype=splunkd component=ServerConfig log_level=INFO count=35 ###
+sourcetype=splunkd component=ServerRoles log_level=INFO count=15 ###
+sourcetype=splunkd component=ShutdownHandler log_level=INFO count=320 ###
+sourcetype=splunkd component=SpecFiles log_level=INFO count=70 ###
+sourcetype=splunkd component=TailReader log_level=ERROR count=100 ###
+sourcetype=splunkd component=TailReader log_level=INFO count=64 ###
+sourcetype=splunkd component=TailingProcessor log_level=INFO count=110 ###
+sourcetype=splunkd component=TcpInputConfig log_level=INFO count=10 ###
+sourcetype=splunkd component=TcpInputProc log_level=INFO count=45 ###
+sourcetype=splunkd component=TcpOutputProc log_level=INFO count=15 ###
+sourcetype=splunkd component=TelemetryHandler log_level=WARN count=1 ###
+sourcetype=splunkd component=UiAuth log_level=ERROR count=2 ###
+sourcetype=splunkd component=UiHttpListener log_level=INFO count=20 ###
+sourcetype=splunkd component=Watchdog log_level=ERROR count=5 ###
+sourcetype=splunkd component=Watchdog log_level=INFO count=10 ###
+sourcetype=splunkd component=WatchdogActions log_level=INFO count=5 ###
+sourcetype=splunkd component=WatchdogInit log_level=WARN count=10 ###
+sourcetype=splunkd component=WatchedFile log_level=INFO count=121 ###
+sourcetype=splunkd component=WorkloadManager log_level=INFO count=5 ###
+sourcetype=splunkd component=X509Verify log_level=WARN count=5 ###
+sourcetype=splunkd component=loader log_level=INFO count=155 ###
+sourcetype=splunkd component=ulimit log_level=INFO count=55 ###
+sourcetype=splunkd_conf component=ConfDeployment log_level=INFO count=5 ###
+sourcetype=splunkd_stderr component= log_level= count=10 ###
+sourcetype=testdata component= log_level= count=294
+"
+| makemv delim="###" raw
+| mvexpand raw 
+| rename raw  as  _raw 
+| extract
+| eval component = coalesce(component,"") 
+| eval log_level = coalesce(log_level,"") 
+|  table sourcetype component log_level count</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="height">450</option>
+        <option name="sunburst_viz.sunburst_viz.breadcrumbs">hide</option>
+        <option name="sunburst_viz.sunburst_viz.color">interpolateRainbow</option>
+        <option name="sunburst_viz.sunburst_viz.colormode">name</option>
+        <option name="sunburst_viz.sunburst_viz.coloroverride">INFO,green,WARNING,orange,ERROR,red</option>
+        <option name="sunburst_viz.sunburst_viz.labelcolor">#000000</option>
+        <option name="sunburst_viz.sunburst_viz.labels">show</option>
+        <option name="sunburst_viz.sunburst_viz.labelsize">120</option>
+        <option name="sunburst_viz.sunburst_viz.labelwidth">120</option>
+        <option name="sunburst_viz.sunburst_viz.mode">static</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+      </viz>
+    </panel>
+  </row>
+</dashboard>

@@ -1,0 +1,70 @@
+<form class="splunk-formatter-section" section-label="General">
+
+        <splunk-control-group label="Shape" help="">
+                <splunk-select name="{{VIZ_NAMESPACE}}.shape" value="hexagon">
+                        <option value="hexagon">Hexagon</option>
+                        <option value="square">Square</option>
+                        <option value="diamond">Diamond</option>
+                        <option value="circle">Circle</option>
+                </splunk-select>
+        </splunk-control-group>
+
+        <splunk-control-group label="Color " help="Ignored if an override color is set below">
+                <splunk-select name="{{VIZ_NAMESPACE}}.color" value="greentored1">
+                        <option value="greentored1">Green to red 1</option>
+                        <option value="greentored2">Green to red 2</option>
+                        <option value="greentored3">Green to red 3</option>
+                        <option value="green">Green</option>
+                        <option value="lightpurple">Purple</option>
+                        <option value="darkblue">Dark blue</option>
+                        <option value="lightblue">Light blue</option>
+                        <option value="lightorange">Light orange</option>
+                        <option value="darkorange">Dark orange</option>
+                        <option value="pink">Pink</option>
+                </splunk-select>
+        </splunk-control-group>
+
+        <splunk-control-group label="Override color" help="One or more space separated color codes">
+                <splunk-text-input name="{{VIZ_NAMESPACE}}.colorcustom" value=""></splunk-text-input>
+        </splunk-control-group>
+
+        <splunk-control-group label="Data range" help="Used to determine item colour from 'value' field">
+                <splunk-text-input name="{{VIZ_NAMESPACE}}.min" value="0" style="width:64px; vertical-align:top; display:inline-block; flex:none; margin-right:4px;"></splunk-text-input>
+                <span style="display:inline-block; margin:5px 15px 5px 5px;"> to </span>
+                <splunk-text-input name="{{VIZ_NAMESPACE}}.max" value="100" style="width:64px; vertical-align:top; display:inline-block; flex:none; margin-right:4px;"></splunk-text-input>
+        </splunk-control-group>
+
+        <splunk-control-group label="Margin size" help="Space between items">
+                <splunk-text-input name="{{VIZ_NAMESPACE}}.margin" value="1" style="width:64px; vertical-align:top; display:inline-block; flex:none; margin-right:4px;"></splunk-text-input>
+                <span style="display:inline-block; margin:5px 15px 5px 5px;">px</span>
+        </splunk-control-group> 
+
+        <splunk-control-group label="Group shading" help="Background shading when using grouping">
+                <splunk-radio-input name="{{VIZ_NAMESPACE}}.groupbg" value="none">
+                        <option value="snap">Snap</option>
+                        <option value="full">Full</option>
+                        <option value="none">None</option>
+                </splunk-radio-input>
+        </splunk-control-group>
+
+        <splunk-control-group label="Max rows" help="Max items before an error is shown">
+                <splunk-text-input name="{{VIZ_NAMESPACE}}.maxrows" value="3000" style="width:64px; vertical-align:top; display:inline-block; flex:none; margin-right:4px;"></splunk-text-input>
+        </splunk-control-group>
+
+        <splunk-control-group label="Token" help="You must also provide a 'drilldown' field in the data">
+                <splunk-text-input name="{{VIZ_NAMESPACE}}.token" value="heatgrid_viz_drilldown"></splunk-text-input>
+        </splunk-control-group> 
+
+</form>
+
+<form class="splunk-formatter-section" section-label="Help">
+        <splunk-control-group label=" " help="">
+                <div style="margin:20px 10px 10px -90px">
+                        <div>Data should contain fields with specific names. See documention for more details</div>
+                        <div style="margin-top:10px;">Mandatory fields: <code>value</code> or <code>color</code> </div>
+                        <div style="margin-top:10px;">Optional fields: <code>tooltip</code> <code>tooltip_value</code> <code>tooltip_html</code> <code>group</code> <code>drilldown</code> <code>tooltip_html</code>.</div>
+                        <div style="margin-top:30px;"><a href="/app/heatgrid_viz/documentation" target="_blank">Examples and Documentation</a></div>
+                        <div style="margin-top:40px;">By Chris Younger - <a href="https://splunkbase.splunk.com/apps/#/author/chrisyoungerjds" target="_blank">My other apps</a></div>
+                </div> 
+        </splunk-control-group>
+</form>

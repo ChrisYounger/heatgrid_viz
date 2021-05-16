@@ -1,0 +1,9 @@
+display.visualizations.custom.heatgrid_viz.heatgrid_viz.shape = <string>
+display.visualizations.custom.heatgrid_viz.heatgrid_viz.color = <string>
+display.visualizations.custom.heatgrid_viz.heatgrid_viz.colorcustom = <string>
+display.visualizations.custom.heatgrid_viz.heatgrid_viz.min = <string>
+display.visualizations.custom.heatgrid_viz.heatgrid_viz.max = <string>
+display.visualizations.custom.heatgrid_viz.heatgrid_viz.margin = <string>
+display.visualizations.custom.heatgrid_viz.heatgrid_viz.groupbg = <string>
+display.visualizations.custom.heatgrid_viz.heatgrid_viz.token = <string>
+display.visualizations.custom.heatgrid_viz.heatgrid_viz.maxrows = <string>
