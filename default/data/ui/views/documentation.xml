@@ -11,15 +11,15 @@
 <div style="max-width: 1200px; margin: 0 auto;">
 <p>Configurable Heat Grid / Heatmap visualization that can be used to show the quick status or health of many items at once. Support for grouping, and can display as hexagons, squares, diamonds or circles. Fully customisable tooltips, drilldown support, and numerous color schemes. Works in dark-mode.</p>
 <br/>
-<p>Copyright (C) 2020 Chris Younger | <a href="https://github.com/ChrisYounger/heatgrid_viz">Source code</a> | <a href="https://splunkbase.splunk.com/app/TODO/">Splunkbase</a> | <a href="https://answers.splunk.com/app/questions/TODO.html">Questions, Bugs or Suggestions</a> | <a href="https://splunkbase.splunk.com/apps/#/author/chrisyoungerjds">My Splunk apps</a></p>
+<p>Copyright (C) 2021 Chris Younger | <a href="https://github.com/ChrisYounger/heatgrid_viz">Source code</a> | <a href="https://splunkbase.splunk.com/app/5541/">Splunkbase</a> | <a href="https://answers.splunk.com/app/questions/5541.html">Questions, Bugs or Suggestions</a> | <a href="https://splunkbase.splunk.com/apps/#/author/chrisyoungerjds">My Splunk apps</a></p>
 
 <br/>
 <br/>
 
 <h2>Usage</h2>
-<p>This visualisation expects data with specific field names. </p>
+<p>This visualisation expects data with specific field names. Use <code>| rename</code> to make sure your fields match what is expected. Every row of data will become a cell in the heatgrid. Data must always have "value" or "color" field (not both). If the "value" field is provided, the color will be automatically set based on the selected color gradiant. It is also possible to explicitly set color in the data by providing a "color" field.</p>
 <pre class="highlight">
-<code>some search... | table value tooltip group</code></pre>
+<code>...some search... | table value tooltip group</code></pre>
 <br/>
 <br/>
 <p>These are the fields that can be provided in data:</p>
@@ -98,6 +98,10 @@
 
 <img src="/static/app/heatgrid_viz/formatting.png"/>
 <br/>
+<ul>
+<li>If an "override color" is set, this will always override the selected color scheme. </li>
+<li>The "override color" can be a single HTML color code (e.g. #00ff00) and a color gradiant will be generated automatically. Otherwise set a space separated list of multiple color codes.</li>
+</ul>
 <br/>
 <br/>
 
@@ -113,173 +117,163 @@
 </html>
     </panel>
     <panel>
-      <viz type="sunburst_viz.sunburst_viz">
-        <title>Example 1</title>
+    <html>
+    <h1>Basic example</h1>
+    <p>Note that <code>tooltip</code> and <code>tooltip_value</code> are optional</p>
+    </html>
+      <table>
+        <title>1000 rows of data like this:</title>
         <search>
-          <query>| makeresults   
-| eval raw = "
-index=checkpoint sourcetype=opsec source=1.2.3.4 count=936498 ### 
-index=checkpoint sourcetype=opsec source=1.2.5.6 count=856998 ### 
-index=gateways sourcetype=pan_traffic source=/rsyslog/1.2.3.4/XX.log count=1200098 ### 
-index=gateways sourcetype=f5 source=/rsyslog/1.2.3.6/XX.log count=200098 ### 
-index=sysmon sourcetype=XmlWinEventLog:Microsoft-Windows-Sysmon/Operational	source=WinEventLog:ForwardedEvents	 count=356998 ### 
-index=stream sourcetype=stream:ip	source=stream:Splunk_IP count=256998 ### 
-index=gateway sourcetype=iis	source=C:\inetpub\logs\LogFiles\W#SVC#\u_ex#.log count=156998 ### 
-index=summary sourcetype=stash	source=Datamodel Status Trend count=56998 ### 
-index=stream sourcetype=stream:udp	source=stream:Splunk_Udp count=56998
-"
-| makemv delim="###" raw
-| mvexpand raw 
-| rename raw  as  _raw 
-| extract
-|  table index sourcetype source count</query>
-          <earliest>-15m</earliest>
+          <query>
+| makeresults count=3 
+| streamstats count as id 
+| eval value = if((random()%5) == 1, random()%100, random()%10) 
+| eval tooltip = "SERVER" + id
+| eval tooltip_value = value + " %"
+| table tooltip value tooltip_value
+          </query>
+          <earliest>-24h@h</earliest>
           <latest>now</latest>
           <sampleRatio>1</sampleRatio>
         </search>
         <option name="drilldown">none</option>
-        <option name="height">450</option>
         <option name="refresh.display">progressbar</option>
-        <option name="sunburst_viz.sunburst_viz.breadcrumbs">show</option>
-        <option name="sunburst_viz.sunburst_viz.color">schemeCategory10</option>
-        <option name="sunburst_viz.sunburst_viz.colormode">root</option>
-        <option name="sunburst_viz.sunburst_viz.labelcolor">#000000</option>
-        <option name="sunburst_viz.sunburst_viz.labels">show</option>
-        <option name="sunburst_viz.sunburst_viz.labelsize">120</option>
-        <option name="sunburst_viz.sunburst_viz.labelwidth">120</option>
-        <option name="sunburst_viz.sunburst_viz.mode">static</option>
+      </table>
+      <viz type="heatgrid_viz.heatgrid_viz">
+        <title>will produce a result like this:</title>
+        <search>
+          <query>
+| makeresults count=1000 
+| streamstats count as id 
+| eval value = if((random()%5) == 1, random()%100, random()%10) 
+| eval tooltip = "SERVER" + id
+| eval tooltip_value = value + " %"
+| table tooltip value tooltip_value</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="height">150</option>
+        <option name="drilldown">none</option>
+        <option name="heatgrid_viz.heatgrid_viz.color">greentored1</option>
+        <option name="heatgrid_viz.heatgrid_viz.margin">1</option>
+        <option name="heatgrid_viz.heatgrid_viz.max">100</option>
+        <option name="heatgrid_viz.heatgrid_viz.maxrows">1500</option>
+        <option name="heatgrid_viz.heatgrid_viz.min">0</option>
+        <option name="heatgrid_viz.heatgrid_viz.shape">square</option>
+        <option name="heatgrid_viz.heatgrid_viz.token">heatgrid_viz_drilldown</option>
+        <option name="refresh.display">progressbar</option>
         <option name="trellis.enabled">0</option>
         <option name="trellis.scales.shared">1</option>
         <option name="trellis.size">medium</option>
       </viz>
-      <viz type="sunburst_viz.sunburst_viz">
-        <title>Example 2</title>
+    <html>
+    <h1 style="margin-top:50px">Example with grouping, custom HTML tooltips and drill-down</h1>
+    </html>
+      <table>
+        <title>100 rows of data like this:</title>
         <search>
-          <query>| makeresults   
-| eval raw = "
-sourcetype=config_explorer component= log_level= count=627 ###
-sourcetype=ex23sample_controller-2 component= log_level= count=5 ###
-sourcetype=example_code-2 component= log_level= count=5 ###
-sourcetype=metric_collector-2 component= log_level= count=140 ###
-sourcetype=mongod component=system log_level= count=521 ###
-sourcetype=scheduler component=SavedSearchHistory log_level=INFO count=20 ###
-sourcetype=scheduler component=SavedSplunker log_level=INFO count=34 ###
-sourcetype=splunk:tabuilder:log component= log_level= count=210 ###
-sourcetype=splunk_archiver-2 component= log_level= count=24 ###
-sourcetype=splunk_instrumentation-3 component= log_level= count=307 ###
-sourcetype=splunk_web_access component= log_level= count=3839 ###
-sourcetype=splunk_web_service component=__init__ log_level=INFO count=40 ###
-sourcetype=splunk_web_service component=admin log_level=INFO count=1 ###
-sourcetype=splunk_web_service component=appnav log_level=WARNING count=172 ###
-sourcetype=splunk_web_service component=config log_level=ERROR count=5 ###
-sourcetype=splunk_web_service component=custom log_level=INFO count=70 ###
-sourcetype=splunk_web_service component=error log_level=INFO count=5 ###
-sourcetype=splunk_web_service component=i18n_catalog log_level=INFO count=200 ###
-sourcetype=splunk_web_service component=lists log_level=INFO count=20 ###
-sourcetype=splunk_web_service component=root log_level=INFO count=942 ###
-sourcetype=splunk_web_service component=view log_level=INFO count=346 ###
-sourcetype=splunkd component=ApplicationLicense log_level=INFO count=5 ###
-sourcetype=splunkd component=AuthenticationManagerSplunk log_level=WARN count=1 ###
-sourcetype=splunkd component=BucketMover log_level=INFO count=24 ###
-sourcetype=splunkd component=BundlesSetup log_level=INFO count=5 ###
-sourcetype=splunkd component=CMBucketId log_level=INFO count=20 ###
-sourcetype=splunkd component=CertStorageProvider log_level=INFO count=20 ###
-sourcetype=splunkd component=ClientSessionsManager log_level=INFO count=5 ###
-sourcetype=splunkd component=ClusteringMgr log_level=INFO count=10 ###
-sourcetype=splunkd component=DC:DeploymentClient log_level=INFO count=5 ###
-sourcetype=splunkd component=DC:DeploymentClient log_level=WARN count=5 ###
-sourcetype=splunkd component=DSManager log_level=INFO count=10 ###
-sourcetype=splunkd component=DS_DC_Common log_level=INFO count=30 ###
-sourcetype=splunkd component=DatabaseDirectoryManager log_level=INFO count=325 ###
-sourcetype=splunkd component=DeploymentServer log_level=INFO count=10 ###
-sourcetype=splunkd component=ExecProcessor log_level=INFO count=107 ###
-sourcetype=splunkd component=HotBucketRoller log_level=INFO count=68 ###
-sourcetype=splunkd component=HotDBManager log_level=INFO count=332 ###
-sourcetype=splunkd component=HttpListener log_level=ERROR count=4 ###
-sourcetype=splunkd component=HttpListener log_level=WARN count=1 ###
-sourcetype=splunkd component=IndexConfig log_level=WARN count=40 ###
-sourcetype=splunkd component=IndexProcessor log_level=INFO count=45 ###
-sourcetype=splunkd component=IndexWriter log_level=INFO count=196 ###
-sourcetype=splunkd component=IndexerIf log_level=INFO count=27 ###
-sourcetype=splunkd component=IndexerInit log_level=INFO count=5 ###
-sourcetype=splunkd component=IndexerService log_level=INFO count=55 ###
-sourcetype=splunkd component=IntrospectionGenerator:disk_objects log_level=INFO count=15 ###
-sourcetype=splunkd component=IntrospectionGenerator:resource_usage log_level=ERROR count=5 ###
-sourcetype=splunkd component=IntrospectionGenerator:resource_usage log_level=INFO count=10 ###
-sourcetype=splunkd component=IntrospectionGenerator:resource_usage log_level=WARN count=5 ###
-sourcetype=splunkd component=KeyManagerLocalhost log_level=INFO count=30 ###
-sourcetype=splunkd component=LMConfig log_level=INFO count=45 ###
-sourcetype=splunkd component=LMSlaveInfo log_level=INFO count=11 ###
-sourcetype=splunkd component=LMStack log_level=INFO count=5 ###
-sourcetype=splunkd component=LMStackMgr log_level=INFO count=47 ###
-sourcetype=splunkd component=LMTracker log_level=INFO count=230 ###
-sourcetype=splunkd component=LicenseMgr log_level=INFO count=20 ###
-sourcetype=splunkd component=LicenseUsage log_level=INFO count=2 ###
-sourcetype=splunkd component=MPool log_level=INFO count=5 ###
-sourcetype=splunkd component=ModularInputs log_level=INFO count=75 ###
-sourcetype=splunkd component=OnlineFsck log_level=INFO count=17 ###
-sourcetype=splunkd component=PipeFlusher log_level=INFO count=10 ###
-sourcetype=splunkd component=PipelineComponent log_level=INFO count=20 ###
-sourcetype=splunkd component=ProcessTracker log_level=INFO count=16 ###
-sourcetype=splunkd component=ProcessTracker log_level=WARN count=80 ###
-sourcetype=splunkd component=ProxyConfig log_level=INFO count=15 ###
-sourcetype=splunkd component=PubSubSvr log_level=INFO count=20 ###
-sourcetype=splunkd component=Rsa2FA log_level=INFO count=10 ###
-sourcetype=splunkd component=SHCConfig log_level=WARN count=5 ###
-sourcetype=splunkd component=SHClusterMgr log_level=INFO count=10 ###
-sourcetype=splunkd component=ScheduledViewsReaper log_level=INFO count=5 ###
-sourcetype=splunkd component=ServerConfig log_level=INFO count=35 ###
-sourcetype=splunkd component=ServerRoles log_level=INFO count=15 ###
-sourcetype=splunkd component=ShutdownHandler log_level=INFO count=320 ###
-sourcetype=splunkd component=SpecFiles log_level=INFO count=70 ###
-sourcetype=splunkd component=TailReader log_level=ERROR count=100 ###
-sourcetype=splunkd component=TailReader log_level=INFO count=64 ###
-sourcetype=splunkd component=TailingProcessor log_level=INFO count=110 ###
-sourcetype=splunkd component=TcpInputConfig log_level=INFO count=10 ###
-sourcetype=splunkd component=TcpInputProc log_level=INFO count=45 ###
-sourcetype=splunkd component=TcpOutputProc log_level=INFO count=15 ###
-sourcetype=splunkd component=TelemetryHandler log_level=WARN count=1 ###
-sourcetype=splunkd component=UiAuth log_level=ERROR count=2 ###
-sourcetype=splunkd component=UiHttpListener log_level=INFO count=20 ###
-sourcetype=splunkd component=Watchdog log_level=ERROR count=5 ###
-sourcetype=splunkd component=Watchdog log_level=INFO count=10 ###
-sourcetype=splunkd component=WatchdogActions log_level=INFO count=5 ###
-sourcetype=splunkd component=WatchdogInit log_level=WARN count=10 ###
-sourcetype=splunkd component=WatchedFile log_level=INFO count=121 ###
-sourcetype=splunkd component=WorkloadManager log_level=INFO count=5 ###
-sourcetype=splunkd component=X509Verify log_level=WARN count=5 ###
-sourcetype=splunkd component=loader log_level=INFO count=155 ###
-sourcetype=splunkd component=ulimit log_level=INFO count=55 ###
-sourcetype=splunkd_conf component=ConfDeployment log_level=INFO count=5 ###
-sourcetype=splunkd_stderr component= log_level= count=10 ###
-sourcetype=testdata component= log_level= count=294
-"
-| makemv delim="###" raw
-| mvexpand raw 
-| rename raw  as  _raw 
-| extract
-| eval component = coalesce(component,"") 
-| eval log_level = coalesce(log_level,"") 
-|  table sourcetype component log_level count</query>
-          <earliest>-15m</earliest>
+          <query>
+| makeresults count=5 
+| streamstats count as id 
+| eval value = if((random()%5) == 1, random()%100, random()%10) 
+| eval tooltip_html = "SERVER" + id + "&lt;br&gt;Location: Sydney&lt;br&gt;Owner: Operations&lt;br&gt;CPU: &lt;b&gt;" + value + "%&lt;/b&gt;"
+| eval random = random()%100
+| eval group = case(random &lt; 50, "Production", random &lt; 80, "Testing", true(), "Development")
+| eval drilldown = "servers?host=" + tooltip 
+| eventstats count by group
+| eval group = group + " (" + count + " items)" 
+| table tooltip value group drilldown tooltip_html
+          </query>
+          <earliest>-24h@h</earliest>
           <latest>now</latest>
           <sampleRatio>1</sampleRatio>
         </search>
         <option name="drilldown">none</option>
-        <option name="height">450</option>
-        <option name="sunburst_viz.sunburst_viz.breadcrumbs">hide</option>
-        <option name="sunburst_viz.sunburst_viz.color">interpolateRainbow</option>
-        <option name="sunburst_viz.sunburst_viz.colormode">name</option>
-        <option name="sunburst_viz.sunburst_viz.coloroverride">INFO,green,WARNING,orange,ERROR,red</option>
-        <option name="sunburst_viz.sunburst_viz.labelcolor">#000000</option>
-        <option name="sunburst_viz.sunburst_viz.labels">show</option>
-        <option name="sunburst_viz.sunburst_viz.labelsize">120</option>
-        <option name="sunburst_viz.sunburst_viz.labelwidth">120</option>
-        <option name="sunburst_viz.sunburst_viz.mode">static</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+      <viz type="heatgrid_viz.heatgrid_viz">
+        <title>will produce a result like this:</title>
+        <search>
+          <query>
+| makeresults count=100 
+| streamstats count as id 
+| eval value = if((random()%5) == 1, random()%100, random()%10) 
+| eval tooltip = "SERVER" + id
+| eval tooltip_html = "SERVER" + id + "&lt;br&gt;Location: Sydney&lt;br&gt;Owner: Operations&lt;br&gt;CPU: &lt;b&gt;" + value + "%&lt;/b&gt;"
+| eval random = random()%100
+| eval group = case(random &lt; 50, "Production", random &lt; 80, "Testing", true(), "Development")
+| eval drilldown = "servers?host=" + tooltip 
+| eventstats count by group
+| eval group = group + " (" + count + " items)" 
+| sort 0 - count
+| table tooltip value group tooltip_html drilldown </query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="height">250</option>
+        <option name="drilldown">none</option>
+        <option name="heatgrid_viz.heatgrid_viz.color">greentored1</option>
+        <option name="heatgrid_viz.heatgrid_viz.margin">1</option>
+        <option name="heatgrid_viz.heatgrid_viz.max">100</option>
+        <option name="heatgrid_viz.heatgrid_viz.maxrows">1500</option>
+        <option name="heatgrid_viz.heatgrid_viz.min">0</option>
+        <option name="heatgrid_viz.heatgrid_viz.shape">square</option>
+        <option name="heatgrid_viz.heatgrid_viz.token">heatgrid_viz_drilldown</option>
+        <option name="refresh.display">progressbar</option>
         <option name="trellis.enabled">0</option>
         <option name="trellis.scales.shared">1</option>
         <option name="trellis.size">medium</option>
       </viz>
+    <html>
+    <h1 style="margin-top:50px">Example with the color set in the data (rather than using "value" field)</h1>
+    </html>
+      <table>
+        <title>100 rows of data like this:</title>
+        <search>
+          <query>| makeresults count=5
+| streamstats count as id 
+| eval tooltip = "SERVER" + id
+| eval tooltip_value = if((random()%5) == 1, "Offline", "Online")
+| eval color = if(tooltip_value == "Offline", "#EE174B", "#6DD381")
+| table tooltip tooltip_value color</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+      <viz type="heatgrid_viz.heatgrid_viz">
+        <title>will produce a result like this:</title>
+        <search>
+          <query>| makeresults count=100 
+| streamstats count as id 
+| eval tooltip = "SERVER" + id
+| eval tooltip_value = if((random()%30) == 1, "Offline", "Online")
+| eval color = if(tooltip_value == "Offline", "#EE174B", "#6DD381")
+| table tooltip tooltip_value color</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="height">250</option>
+        <option name="drilldown">none</option>
+        <option name="heatgrid_viz.heatgrid_viz.color">greentored1</option>
+        <option name="heatgrid_viz.heatgrid_viz.groupbg">none</option>
+        <option name="heatgrid_viz.heatgrid_viz.margin">3</option>
+        <option name="heatgrid_viz.heatgrid_viz.max">100</option>
+        <option name="heatgrid_viz.heatgrid_viz.maxrows">1500</option>
+        <option name="heatgrid_viz.heatgrid_viz.min">0</option>
+        <option name="heatgrid_viz.heatgrid_viz.shape">hexagon</option>
+        <option name="heatgrid_viz.heatgrid_viz.token">heatgrid_viz_drilldown</option>
+        <option name="height">279</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+      </viz>      
     </panel>
   </row>
 </dashboard>
