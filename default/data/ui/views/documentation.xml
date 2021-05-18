@@ -180,10 +180,10 @@
 | eval tooltip_html = "SERVER" + id + "&lt;br&gt;Location: Sydney&lt;br&gt;Owner: Operations&lt;br&gt;CPU: &lt;b&gt;" + value + "%&lt;/b&gt;"
 | eval random = random()%100
 | eval group = case(random &lt; 50, "Production", random &lt; 80, "Testing", true(), "Development")
-| eval drilldown = "servers?host=" + tooltip 
+| eval drilldown = "servers?host=" + "SERVER" + id 
 | eventstats count by group
 | eval group = group + " (" + count + " items)" 
-| table tooltip value group drilldown tooltip_html
+| table value group drilldown tooltip_html
           </query>
           <earliest>-24h@h</earliest>
           <latest>now</latest>

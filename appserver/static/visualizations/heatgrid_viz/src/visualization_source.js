@@ -44,9 +44,9 @@ function(
             viz.config = {
                 color: "greentored1", 
                 colorcustom: "",
-                shape: "hexagon",
+                shape: "square",
                 margin: "1",
-                maxrows: "3000",
+                maxrows: "5000",
                 min: "0",
                 max: "100",
                 groupbg: "snap",
@@ -237,7 +237,7 @@ function(
                 var groupdata = treemap(groupheirachydata).leaves();
 
                 viz.final_box_size = null;
-                var top_margin = 24;
+                var top_margin = 30;
                 var other_margin = 6;
                 for (j = 0; j < groupdata.length; j++) {
                     viz.groups[ groupdata[j].data.name ].avail_width = (groupdata[j].x1 - groupdata[j].x0 - (other_margin * 2));
@@ -289,7 +289,7 @@ function(
 
                 if (viz.config.groupbg !== "none") {
                     leaf.append("rect")
-                        .attr("fill", (viz.theme === 'light' ? "#e1e6eb" : "#171d21"))
+                        .attr("fill", (viz.theme === 'light' ? "#f2f4f5" : "#171d21"))
                         //.attr("fill-opacity", 0.2)
                         .attr("width", function(d) { 
                             if (viz.config.groupbg === "full") {
@@ -439,25 +439,32 @@ function(
                     }
                     return 'M '+ left_offset +' '+ top_offset +' ' + path + ' z';
                 })
-                .attr("fill", function(d) { return (datacolumns.color === null) ? colorFunction(d.value) : d.color; })
+                .attr("fill", function(d) { return (datacolumns.color === null) ? colorFunction(Math.min(Math.max(d.value, viz.config.min), viz.config.max)) : d.color; })
                 .on("mouseover", function(d) { 
                     d3.select(this).transition().duration(10).attr("stroke-width", 3);
                     var tt = $("<div></div>");
+                    var hascontents = false;
                     if (datacolumns.tooltip_html === null) {
-                        if (datacolumns.tooltip !== null) {
+                        if (datacolumns.tooltip !== null && d.tooltip !== "") {
                             $("<div></div>").text(d.tooltip).appendTo(tt);
+                            hascontents = true;
                         }
-                        if (datacolumns.tooltip_value !== null) {
+                        if (datacolumns.tooltip_value !== null && d.tooltip_value !== "") {
                             $("<div style='text-align:right; font-weight:bold;'></div>").text(d.tooltip_value).appendTo(tt);
-                        } else if (datacolumns.value !== null) {
+                            hascontents = true;
+                        } else if (datacolumns.value !== null && d.value !== "") {
                             $("<div style='text-align:right; font-weight:bold;'></div>").text(d.value).appendTo(tt);
+                            hascontents = true;
                         }
-                    } else {
+                    } else if (d.tooltip_html !== "") {
                         tt.html(d.tooltip_html).appendTo(tt);
+                        hascontents = true;
                     }
-                    viz.container_wrap_offset = viz.$container_wrap.offset();
-                    viz.tooltip_over = true;
-                    return tooltip.css("visibility", "visible").html(tt);
+                    if (hascontents){
+                        viz.container_wrap_offset = viz.$container_wrap.offset();
+                        viz.tooltip_over = true;
+                        return tooltip.css("visibility", "visible").html(tt);
+                    }
                 })
                 .on("mousemove", function() { 
                     // assume a 50px tooltip height for simplicity

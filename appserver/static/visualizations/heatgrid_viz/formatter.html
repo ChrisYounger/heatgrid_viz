@@ -1,7 +1,7 @@
 <form class="splunk-formatter-section" section-label="General">
 
         <splunk-control-group label="Shape" help="">
-                <splunk-select name="{{VIZ_NAMESPACE}}.shape" value="hexagon">
+                <splunk-select name="{{VIZ_NAMESPACE}}.shape" value="square">
                         <option value="hexagon">Hexagon</option>
                         <option value="square">Square</option>
                         <option value="diamond">Diamond</option>
@@ -48,7 +48,7 @@
         </splunk-control-group>
 
         <splunk-control-group label="Max rows" help="Max items before an error is shown">
-                <splunk-text-input name="{{VIZ_NAMESPACE}}.maxrows" value="3000" style="width:64px; vertical-align:top; display:inline-block; flex:none; margin-right:4px;"></splunk-text-input>
+                <splunk-text-input name="{{VIZ_NAMESPACE}}.maxrows" value="5000" style="width:64px; vertical-align:top; display:inline-block; flex:none; margin-right:4px;"></splunk-text-input>
         </splunk-control-group>
 
         <splunk-control-group label="Token" help="You must also provide a 'drilldown' field in the data">
