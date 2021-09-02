@@ -134,11 +134,11 @@ function(
             }
 
             if (datacolumns.value === null && datacolumns.color === null) {
-                viz.$container_wrap.empty().append("<div class='heatgrid_viz-bad_data'>Error: A \"value\" or \"color\" field is mandatory and could not be found.<br/>This visualization expects data with specific field names.<br />See the format dropdown button which lists the other fields that can be set.</div>");
+                viz.$container_wrap.empty().append("<div class='heatgrid_viz-bad_data'>Error: A \"value\" or \"color\" field is mandatory and could not be found.<br/>This visualization expects data with specific field names.<br />See the format dropdown button which lists the other fields that can be set.<br /><a href='/app/heatgrid_viz/documentation' target='_blank'>Click here for examples and documentation</a></div>");
                 return;
             }
             if (viz.indata.rows.length > viz.config.maxrows) {
-                viz.$container_wrap.empty().append("<div class='heatgrid_viz-bad_data'>Error: Too many rows of data.<br />Increase limit in formatting settings. (Total rows:" + viz.indata.rows.length + ", Limit: " + viz.config.maxrows + "). </div>");
+                viz.$container_wrap.empty().append("<div class='heatgrid_viz-bad_data'>Error: Too many rows of data.<br />Increase limit in formatting settings. (Total rows:" + viz.indata.rows.length + ", Limit: " + viz.config.maxrows + ").</div>");
                 return;
             }
 
